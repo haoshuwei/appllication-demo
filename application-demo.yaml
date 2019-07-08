@@ -2,6 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: application-demo
+  namespace: user1
 spec:
   replicas: 2
   selector:
@@ -14,7 +15,7 @@ spec:
     spec:
       containers:
       - name: application-demo
-        image: IMAGE_REPO:IMAGE_TAG
+        image: ${IMAGE_REPO}:${IMAGE_TAG}
         ports:
         - containerPort: 8080
 
@@ -23,29 +24,13 @@ apiVersion: v1
 kind: Service
 metadata:
   name: application-demo
+  namespace: user1
 spec:
   ports:
   - port: 80
     targetPort: 8080
     name: application-demo
+    nodePort: 30372
   selector:
     app: application-demo
-  type: LoadBalancer
-
----
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: application-demo
-  labels:
-    app: application-demo
-spec:
-  rules:
-    - host: INGRESS_HOST.cbf5fdabb9f6a4d5897190935ab3d3155.cn-beijing.alicontainer.com
-      http:
-        paths:
-          - path: 
-            backend:
-              serviceName: application-demo
-              servicePort: 80
-
+  type: NodePort
